@@ -1,5 +1,4 @@
 # Battle-of-the-Models
-# Battle-of-the-Models
 # 🔍 Multi-Model Classification Benchmarking Project
 
 ## 📌 Overview
