@@ -50,6 +50,18 @@ df = None
 if uploaded_file is not None:
     df = load_data(uploaded_file)
     df = df.dropna()
+    # Title and description
+    st.title("Machine Learning Model Comparison Dashboard")
+    st.markdown("""
+        This app allows you to:
+        - Upload your dataset
+        - Preprocess the data
+        - Train multiple classification models
+        - Comparest.subheader("Model Accuracy")
+        - Tune hyperparameters
+        - Visualize
+         results
+    """)
 
     if df is not None:
         # make timer to show message
@@ -296,18 +308,12 @@ if uploaded_file is not None:
         else:
             
         # Title and description
-            st.title("Machine Learning Model Comparison Dashboard")
+            st.info("Please upload a dataset file to get started.")
+            st.write("Example dataset structure should include:")
             st.markdown("""
-            This app allows you to:
-            - Upload your dataset
-            - Preprocess the data
-            - Train multiple classification models
-            - Comparest.subheader("Model Accuracy")
-                    st.write(f"{metrics['Accuracy']:.2f}")
-                with col4: their performance metrics
-            - Tune hyperparameters
-            - Visualize
-             results
+                - At least one categorical target variable (binary or multi-class)
+                - Multiple features (numeric and/or categorical)
+                - No missing values or proper handling of missing values
             """)
 
     compare = st.sidebar.checkbox("Comapre all Models", value=False)
