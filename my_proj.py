@@ -305,16 +305,6 @@ if uploaded_file is not None:
 
             except Exception as e:
                 st.error(f"Error plotting confusion matrix or ROC curve: {e}")
-        else:
-            
-        # Title and description
-            st.info("Please upload a dataset file to get started.")
-            st.write("Example dataset structure should include:")
-            st.markdown("""
-                - At least one categorical target variable (binary or multi-class)
-                - Multiple features (numeric and/or categorical)
-                - No missing values or proper handling of missing values
-            """)
 
     compare = st.sidebar.checkbox("Comapre all Models", value=False)
     if compare:
@@ -362,6 +352,17 @@ if uploaded_file is not None:
             st.image(cm_path, caption=f"{model_selection} - Confusion Matrix" )
         else:
             st.warning("Confusion matrix image not found.")
+else:
+            
+# Title and description
+    st.info("Please upload a dataset file to get started.")
+    st.write("Example dataset structure should include:")
+    st.markdown("""
+        - At least one categorical target variable (binary or multi-class)
+        - Multiple features (numeric and/or categorical)
+        - No missing values or proper handling of missing values
+    """)
+
 
 
 
