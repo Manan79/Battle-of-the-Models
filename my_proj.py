@@ -49,6 +49,7 @@ df = None
 
 if uploaded_file is not None:
     df = load_data(uploaded_file)
+    df = df.dropna()
 
     if df is not None:
         # make timer to show message
