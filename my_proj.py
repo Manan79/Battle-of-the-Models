@@ -194,9 +194,9 @@ if uploaded_file is not None:
             
                 return {
                     "Accuracy": accuracy_score(y_test, y_pred),
-                    "Precision": precision_score(y_test, y_pred, average=average, zero_division=0),
-                    "Recall": recall_score(y_test, y_pred, average=average, zero_division=0),
-                    "F1 Score": f1_score(y_test, y_pred, average=average, zero_division=0),
+                    "Precision": precision_score(y_test, y_pred, average=average),
+                    "Recall": recall_score(y_test, y_pred, average=average),
+                    "F1 Score": f1_score(y_test, y_pred, average=average),
                     "ROC AUC": roc_auc,
                     "ypred" : y_pred,
                     "y_proba" : y_prob
