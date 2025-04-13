@@ -239,6 +239,7 @@ if uploaded_file is not None:
                     "ROC AUC": roc_auc,
                     "ypred" : y_pred,
                     "y_proba" : y_prob
+                }
 
 
                         # Handle multiclass case
