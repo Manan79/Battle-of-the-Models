@@ -402,22 +402,6 @@ if uploaded_file is not None:
     
            
         else:
-        # Title and description
-            st.title("Machine Learning Model Comparison Dashboard")
-            st.markdown("""
-            This app allows you to:
-            - Upload your dataset
-            - Preprocess the data
-            - Train multiple classification models
-            - Comparest.subheader("Model Accuracy")
-                    st.write(f"{metrics['Accuracy']:.2f}")
-                with col4: their performance metrics
-            - Tune hyperparameters
-            - Visualize
-             results
-            """)
-
-
 
             col1 , col2  = st.columns(2)
             with col1:
