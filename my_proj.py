@@ -229,8 +229,10 @@ if uploaded_file is not None:
             
                 # Handle multiclass case
                 if len(set(y_test)) > 2:
+                    
                     average = 'macro'
             
+
                 return {
                     "Accuracy": accuracy_score(y_test, y_pred),
                     "Precision": precision_score(y_test, y_pred, average=average , zero_division=1),
@@ -240,6 +242,21 @@ if uploaded_file is not None:
                     "ypred" : y_pred,
                     "y_proba" : y_prob
                 }
+
+
+
+                    # return {
+                    #     "Accuracy": accuracy_score(y_test, y_pred),
+                    #     "Precision": precision_score(y_test, y_pred, average=average , zero_division=1),
+                    #     "Recall": recall_score(y_test, y_pred, average=average , zero_division=1),
+                    #     "F1 Score": f1_score(y_test, y_pred, average=average , zero_division=1),
+                    #     "ROC AUC": roc_auc,
+                    #     "ypred" : y_pred,
+                    #     "y_proba" : y_prob
+                    #     }
+
+
+                     
 
 
             if models_to_train == "Linear Regression":
@@ -343,6 +360,7 @@ if uploaded_file is not None:
                 st.error(f"Please provide Classification problem for selected model: {e}")
                 st.title("Model's Information")
 
+
             col1 , col2  = st.columns(2)
             with col1:
                 st.subheader("Model Parameters")
@@ -398,6 +416,8 @@ if uploaded_file is not None:
             - Visualize
              results
             """)
+
+
 
             col1 , col2  = st.columns(2)
             with col1:
