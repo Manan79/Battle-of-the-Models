@@ -86,7 +86,7 @@ Selecting the optimal machine learning model for classification requires:
 1. Clone the repository:
 
    bash
-   git clone https://github.com/CHAITANYA-GOD/Battle-of-the-Models-.git
+   git clone https://github.com/Manan79/Battle-of-the-Models
    
 
 2. Install required dependencies:
