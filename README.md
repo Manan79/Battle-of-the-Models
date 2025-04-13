@@ -120,6 +120,6 @@ This project successfully demonstrates a *systematic approach to machine learnin
 
 For inquiries, feel free to reach out:
 
-- *Email*: []
-- *LinkedIn*: []
-- *GitHub*: []
+- *Email*: manansood732004@gmail.com
+- *LinkedIn*: https://www.linkedin.com/in/mannan-sood-a38688253/
+- *GitHub*: https://github.com/Manan79
