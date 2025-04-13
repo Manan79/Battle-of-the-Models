@@ -49,6 +49,19 @@ df = None
 
 if uploaded_file is not None:
     df = load_data(uploaded_file)
+    df = df.dropna()
+    # Title and description
+    st.title("Machine Learning Model Comparison Dashboard")
+    st.markdown("""
+        This app allows you to:
+        - Upload your dataset
+        - Preprocess the data
+        - Train multiple classification models
+        - Comparest.subheader("Model Accuracy")
+        - Tune hyperparameters
+        - Visualize
+         results
+    """)
 
     if df is not None:
         # make timer to show message
@@ -185,6 +198,7 @@ if uploaded_file is not None:
             
 
             def evaluate_model(model, X_test, y_test, average='binary'):
+<<<<<<< HEAD
                 if models_to_train == "Linear Regression":
                     y_pred = model.predict(X_test)
                     return {
@@ -203,6 +217,29 @@ if uploaded_file is not None:
                             roc_auc = roc_auc_score(y_test, y_prob)
                         except:
                             roc_auc = None  # Model doesn't support predict_proba
+=======
+                y_pred = model.predict(X_test)
+                
+                # Handle probability prediction safely
+                try:
+                    y_prob = model.predict_proba(X_test)[:, 1]
+                    roc_auc = roc_auc_score(y_test, y_prob)
+                except:
+                    roc_auc = None  # Model doesn't support predict_proba
+            
+                # Handle multiclass case
+                if len(set(y_test)) > 2:
+                    average = 'macro'
+            
+                return {
+                    "Accuracy": accuracy_score(y_test, y_pred),
+                    "Precision": precision_score(y_test, y_pred, average=average , zero_division=1),
+                    "Recall": recall_score(y_test, y_pred, average=average , zero_division=1),
+                    "F1 Score": f1_score(y_test, y_pred, average=average , zero_division=1),
+                    "ROC AUC": roc_auc,
+                    "ypred" : y_pred,
+                    "y_proba" : y_prob
+>>>>>>> 29ffc62028695d40b58ca7e5eae16047519bfe7f
 
                         # Handle multiclass case
                         if len(set(y_test)) > 2:
@@ -319,6 +356,7 @@ if uploaded_file is not None:
                 st.error(f"Please provide Classification problem for selected model: {e}")
                 st.title("Model's Information")
 
+<<<<<<< HEAD
             col1 , col2  = st.columns(2)
             with col1:
                 st.subheader("Model Parameters")
@@ -374,6 +412,52 @@ if uploaded_file is not None:
             - Visualize
              results
             """)
+=======
+                col1 , col2  = st.columns(2)
+                with col1:
+                    st.subheader("Model Parameters")
+                    st.write(model.get_params())
+                with col2:
+                    st.subheader("Model Hyperparameters")
+                    st.write(model.get_params())
+                
+                col3 , col4 , col5 = st.columns(3)
+
+                with col3:
+                    st.write(f"Test size: {test_size}%")
+                with col4:
+                    st.write(f"Random state: {random_state}")
+                with col5 :
+                    st.write(f"Scaling: {scale_numeric}")
+                
+                    
+                col6 , col7= st.columns(2)
+                with col6:
+                    st.write(f"Encoding type: {encode_categorical}")
+                with col7:
+                    st.write(f"Target variable: {target_col}")
+                
+                st.subheader("Feature Importance")
+                if hasattr(model, "feature_importances_"):
+                    feature_importances = model.feature_importances_
+                else:
+                    feature_importances = model.coef_[0] if hasattr(model, "coef_") else None
+                st.write(f"Selected features: {selected_features}")
+                
+                st.table(pd.DataFrame(feature_importances, index=selected_features, columns=["Importance"]).sort_values(by="Importance", ascending=False))
+                fig = plt.figure(figsize=(10, 5))
+                sns.barplot(x=selected_features, y=feature_importances)
+                plt.title("Feature Importance")
+                plt.xticks(rotation=90)
+                st.pyplot(fig)
+                plt.close(fig)
+
+     
+
+
+            except Exception as e:
+                st.error(f"Error plotting confusion matrix or ROC curve: {e}")
+>>>>>>> 29ffc62028695d40b58ca7e5eae16047519bfe7f
 
     compare = st.sidebar.checkbox("Comapre all Models", value=False)
     if compare:
@@ -381,9 +465,7 @@ if uploaded_file is not None:
         with st.spinner("Comparing models..."):
             time.sleep(4)
             st.success("Models compared successfully!")
-            
-        import streamlit as st
-        import pandas as pd
+        
         import altair as alt
         import os
                 
@@ -392,6 +474,7 @@ if uploaded_file is not None:
         
         # Load data
         data = pd.read_csv("model_metrics.csv")
+        data = data.dropna()
         
         # --- 1. METRICS TABLE ---
         st.subheader("📊 Overall Performance Metrics")
@@ -422,6 +505,17 @@ if uploaded_file is not None:
             st.image(cm_path, caption=f"{model_selection} - Confusion Matrix" )
         else:
             st.warning("Confusion matrix image not found.")
+else:
+            
+# Title and description
+    st.info("Please upload a dataset file to get started.")
+    st.write("Example dataset structure should include:")
+    st.markdown("""
+        - At least one categorical target variable (binary or multi-class)
+        - Multiple features (numeric and/or categorical)
+        - No missing values or proper handling of missing values
+    """)
+
 
 
 

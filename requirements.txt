@@ -1,11 +1,10 @@
 pandas
 numpy
-plotly
-xgboost
-time
-matplotlib 
+scikit-learn
+matplotlib
 seaborn
+xgboost
+plotly
 altair
 streamlit
-scikit-learn
 scipy
