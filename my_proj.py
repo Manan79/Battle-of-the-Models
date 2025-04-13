@@ -8,7 +8,7 @@ from sklearn.metrics import precision_recall_curve
 # from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report , r2_score, mean_squared_error, mean_absolute_error, f1_score, roc_auc_score, roc_curve, auc
 from sklearn.metrics import precision_score, recall_score
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression , LinearRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
@@ -136,21 +136,23 @@ if uploaded_file is not None:
 
         models_to_train = st.sidebar.selectbox(
             "Select models to train",
-            ["Logistic Regression", "Decision Tree", "Random Forest",
+            ["Linear Regression", "Logistic Regression", "Decision Tree", "Random Forest",
              "SVM", "Gradient Boosting"], index=2
             
         )
         if models_to_train != "All of the above":
            models = {
+                    "Linear Regression": LinearRegression(),
                     "Logistic Regression": LogisticRegression(max_iter=1000, random_state=random_state),
                     "Decision Tree": DecisionTreeClassifier(random_state=random_state),
                     "Random Forest": RandomForestClassifier(random_state=random_state),
                     "SVM": SVC(probability=True, random_state=random_state),
-                    "Gradient Boosting": GradientBoostingClassifier(random_state=random_state)
+                    "Gradient Boosting": GradientBoostingClassifier(random_state=random_state),
+                    
                 }
            model = models[models_to_train]
         else:
-            models_to_train = ["Logistic Regression", "Decision Tree", "Random Forest",
+            models_to_train = ["Linear Regression","Logistic Regression", "Decision Tree", "Random Forest",
              "SVM", "Gradient Boosting"]
             
         
@@ -168,132 +170,196 @@ if uploaded_file is not None:
         else:
             scaler = None
         
+        new_sucess = st.sidebar.warning("Use Linear Regression for regression problems and other models for classification problems")
+        # i want to show warning for 10 seconds only
+        
         train = st.sidebar.button("Train Models")
         if train:
             model.fit(X_train, y_train)
-            st.sidebar.success(f"{models_to_train} trained successfully!")
+            new_sucess.empty()
+            new_sucess = st.sidebar.success(f"{models_to_train} trained successfully!")
+
 
             # Evaluation Metrics
             st.title(f"Model Evaluation for {models_to_train}")
             
 
             def evaluate_model(model, X_test, y_test, average='binary'):
-                y_pred = model.predict(X_test)
-                
-                # Handle probability prediction safely
-                try:
-                    y_prob = model.predict_proba(X_test)[:, 1]
-                    roc_auc = roc_auc_score(y_test, y_prob)
-                except:
-                    roc_auc = None  # Model doesn't support predict_proba
-            
-                # Handle multiclass case
-                if len(set(y_test)) > 2:
-                    average = 'macro'
-            
-                return {
-                    "Accuracy": accuracy_score(y_test, y_pred),
-                    "Precision": precision_score(y_test, y_pred, average=average, zero_division=0),
-                    "Recall": recall_score(y_test, y_pred, average=average, zero_division=0),
-                    "F1 Score": f1_score(y_test, y_pred, average=average, zero_division=0),
-                    "ROC AUC": roc_auc,
-                    "ypred" : y_pred,
-                    "y_proba" : y_prob
+                if models_to_train == "Linear Regression":
+                    y_pred = model.predict(X_test)
+                    return {
+                        "R2 Score": r2_score(y_test, y_pred),
+                        "Mean Squared Error": mean_squared_error(y_test, y_pred),
+                        "Mean Absolute Error": mean_absolute_error(y_test, y_pred),
+                        "ypred" : y_pred
+                    }
+                elif models_to_train != "Linear Regression":
+                        
+                        y_pred = model.predict(X_test)
+                        y_pred = model.predict(X_test)
+                        # Handle probability prediction safely
+                        try:
+                            y_prob = model.predict_proba(X_test)[:, 1]
+                            roc_auc = roc_auc_score(y_test, y_prob)
+                        except:
+                            roc_auc = None  # Model doesn't support predict_proba
 
+                        # Handle multiclass case
+                        if len(set(y_test)) > 2:
+                            average = 'macro'
+
+                        return {
+                            "Accuracy": accuracy_score(y_test, y_pred),
+                            "Precision": precision_score(y_test, y_pred, average=average, zero_division=0),
+                            "Recall": recall_score(y_test, y_pred, average=average, zero_division=0),
+                            "F1 Score": f1_score(y_test, y_pred, average=average, zero_division=0),
+                            "ROC AUC": roc_auc,
+                            "ypred" : y_pred,
+                            "y_proba" : y_prob
+
+                        }
+            if models_to_train == "Linear Regression":
+                metrics = evaluate_model(model, X_test, y_test)
+                new_metrics = {
+                    "R2 Score": metrics["R2 Score"],
+                    "Mean Squared Error": metrics["Mean Squared Error"],
+                    "Mean Absolute Error": metrics["Mean Absolute Error"]
                 }
-            metrics = evaluate_model(model, X_test, y_test)
-            new_metrics = {
-                "Accuracy": metrics["Accuracy"],
-                "Precision": metrics["Precision"],
-                "Recall": metrics["Recall"],
-                "F1 Score": metrics["F1 Score"],
-                "ROC AUC": metrics["ROC AUC"]
-            }
-            st.subheader("Model Evaluation Metrics")
-            st.table(pd.DataFrame(new_metrics, index=[0]).T)  
-            st.subheader("Classification Report")
-            st.table(classification_report(y_test, metrics['ypred'], output_dict=True))
+                st.subheader("Model Evaluation Metrics")
+                st.table(pd.DataFrame(new_metrics, index=[0]).T)
+                st.subheader("Regression Report")
+            else:
+                metrics = evaluate_model(model, X_test, y_test)
+                new_metrics = {
+                    "Accuracy": metrics["Accuracy"],
+                    "Precision": metrics["Precision"],
+                    "Recall": metrics["Recall"],
+                    "F1 Score": metrics["F1 Score"],
+                    "ROC AUC": metrics["ROC AUC"]
+                }
+                st.subheader("Model Evaluation Metrics")
+                st.table(pd.DataFrame(new_metrics, index=[0]).T)  
+                st.subheader("Classification Report")
+                st.table(classification_report(y_test, metrics['ypred'], output_dict=True))
 
             st.subheader("Actual vs Predicted")
             act_vs_pred = pd.DataFrame({"Actual": y_test, "Predicted": metrics['ypred']})
             st.table(act_vs_pred.head(12))
 
             try:
-                cm = confusion_matrix(y_test, metrics['ypred'])
-                cm_fig = px.imshow(cm,
-                                   labels=dict(x="Predicted", y="Actual", color="Count"),
-                                   x=["Pred 0", "Pred 1"],
-                                   y=["Actual 0", "Actual 1"],
-                                   text_auto=True,
-                                   title="Confusion Matrix")
-                st.plotly_chart(cm_fig, use_container_width=True)
+                if models_to_train != "Linear Regression":
+                    cm = confusion_matrix(y_test, metrics['ypred'])
+                    cm_fig = px.imshow(cm,
+                                       labels=dict(x="Predicted", y="Actual", color="Count"),
+                                       x=["Pred 0", "Pred 1"],
+                                       y=["Actual 0", "Actual 1"],
+                                       text_auto=True,
+                                       title="Confusion Matrix")
+                    st.plotly_chart(cm_fig, use_container_width=True)
 
-                # ROC Curve
-                fpr, tpr, _ = roc_curve(y_test, metrics["y_proba"])
-                roc_auc = auc(fpr, tpr)
+                    # ROC Curve
+                    fpr, tpr, _ = roc_curve(y_test, metrics["y_proba"])
+                    roc_auc = auc(fpr, tpr)
 
-                roc_fig = go.Figure()
-                roc_fig.add_trace(go.Scatter(x=fpr, y=tpr, mode="lines", name=f"AUC = {roc_auc:.2f}"))
-                roc_fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name="Random", line=dict(dash="dash")))
-                roc_fig.update_layout(title="ROC Curve", xaxis_title="False Positive Rate", yaxis_title="True Positive Rate")
-                st.plotly_chart(roc_fig, use_container_width=True)
+                    roc_fig = go.Figure()
+                    roc_fig.add_trace(go.Scatter(x=fpr, y=tpr, mode="lines", name=f"AUC = {roc_auc:.2f}"))
+                    roc_fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name="Random", line=dict(dash="dash")))
+                    roc_fig.update_layout(title="ROC Curve", xaxis_title="False Positive Rate", yaxis_title="True Positive Rate")
+                    st.plotly_chart(roc_fig, use_container_width=True)
 
-                # Precision-Recall Curve
-                precision, recall, _ = precision_recall_curve(y_test, metrics["y_proba"])
-                pr_fig = go.Figure()
-                pr_fig.add_trace(go.Scatter(x=recall, y=precision, mode="lines"))
-                pr_fig.update_layout(title="Precision-Recall Curve", xaxis_title="Recall", yaxis_title="Precision")
-                st.plotly_chart(pr_fig, use_container_width=True)
-                
-                
+                    # Precision-Recall Curve
+                    precision, recall, _ = precision_recall_curve(y_test, metrics["y_proba"])
+                    pr_fig = go.Figure()
+                    pr_fig.add_trace(go.Scatter(x=recall, y=precision, mode="lines"))
+                    pr_fig.update_layout(title="Precision-Recall Curve", xaxis_title="Recall", yaxis_title="Precision")
+                    st.plotly_chart(pr_fig, use_container_width=True)
+                else:
+                    residuals = y_test - metrics['ypred']
+                    fig1 = go.Figure()
+                    fig1.add_trace(go.Scatter(x=y_test, y=metrics['ypred'], mode='markers', name='Predictions'))
+                    fig1.add_trace(go.Scatter(x=y_test, y=metrics['ypred'], mode='lines', name='Perfect Fit', line=dict(dash='dash')))
+                    fig1.update_layout(
+                        title='Actual vs Predicted',
+                        xaxis_title='Actual Values',
+                        yaxis_title='Predicted Values',
+                        template='plotly_white'
+                    )
+
+                    # --- 2. Residual Plot ---
+                    fig2 = go.Figure()
+                    fig2.add_trace(go.Scatter(x=metrics['ypred'], y=residuals, mode='markers', name='Residuals'))
+                    fig2.add_trace(go.Scatter(x=metrics['ypred'], y=[0]*len(metrics['ypred']), mode='lines', name='Zero Line', line=dict(dash='dot')))
+                    fig2.update_layout(
+                        title='Residual Plot',
+                        xaxis_title='Predicted Values',
+                        yaxis_title='Residuals',
+                        template='plotly_white'
+                    )
+
+                    # --- 3. Distribution of Residuals ---
+                    fig3 = px.histogram(residuals, nbins=20, title="Distribution of Residuals")
+                    fig3.update_layout(
+                        xaxis_title='Residual',
+                        yaxis_title='Count',
+                        template='plotly_white'
+                    )
+
+                    # --- Print metrics ---
+                    mse = mean_squared_error(y_test, metrics['ypred'])
+                    r2 = r2_score(y_test, metrics['ypred'])
+                    print(f"Mean Squared Error: {mse:.3f}")
+                    print(f"R² Score: {r2:.3f}")
+
+                    # --- Show plots ---
+                    st.plotly_chart(fig1, use_container_width=True)
+                    st.plotly_chart(fig2, use_container_width=True)
+                    st.plotly_chart(fig3, use_container_width=True)
+                            
+            except Exception as e:
+                st.error(f"Please provide Classification problem for selected model: {e}")
                 st.title("Model's Information")
 
-                col1 , col2  = st.columns(2)
-                with col1:
-                    st.subheader("Model Parameters")
-                    st.write(model.get_params())
-                with col2:
-                    st.subheader("Model Hyperparameters")
-                    st.write(model.get_params())
-                
-                col3 , col4 , col5 = st.columns(3)
-
-                with col3:
-                    st.write(f"Test size: {test_size}%")
-                with col4:
-                    st.write(f"Random state: {random_state}")
-                with col5 :
-                    st.write(f"Scaling: {scale_numeric}")
-                
-                    
-                col6 , col7= st.columns(2)
-                with col6:
-                    st.write(f"Encoding type: {encode_categorical}")
-                with col7:
-                    st.write(f"Target variable: {target_col}")
-                
-                st.subheader("Feature Importance")
-                if hasattr(model, "feature_importances_"):
-                    feature_importances = model.feature_importances_
-                else:
-                    feature_importances = model.coef_[0] if hasattr(model, "coef_") else None
-                st.write(f"Selected features: {selected_features}")
-                
-                st.table(pd.DataFrame(feature_importances, index=selected_features, columns=["Importance"]).sort_values(by="Importance", ascending=False))
-                fig = plt.figure(figsize=(10, 5))
-                sns.barplot(x=selected_features, y=feature_importances)
-                plt.title("Feature Importance")
-                plt.xticks(rotation=90)
-                st.pyplot(fig)
-                plt.close(fig)
-
-     
-
-
-            except Exception as e:
-                st.error(f"Error plotting confusion matrix or ROC curve: {e}")
-        else:
+            col1 , col2  = st.columns(2)
+            with col1:
+                st.subheader("Model Parameters")
+                st.write(model.get_params())
+            with col2:
+                st.subheader("Model Hyperparameters")
+                st.write(model.get_params())
             
+            col3 , col4 , col5 = st.columns(3)
+            with col3:
+                st.write(f"Test size: {test_size}%")
+            with col4:
+                st.write(f"Random state: {random_state}")
+            with col5 :
+                st.write(f"Scaling: {scale_numeric}")
+            
+                
+            col6 , col7= st.columns(2)
+            with col6:
+                st.write(f"Encoding type: {encode_categorical}")
+            with col7:
+                st.write(f"Target variable: {target_col}")
+            
+            st.subheader("Feature Importance")
+            if hasattr(model, "feature_importances_"):
+                feature_importances = model.feature_importances_
+            else:
+                feature_importances = model.coef_[0] if hasattr(model, "coef_") else None
+            st.write(f"Selected features: {selected_features}")
+            
+            st.table(pd.DataFrame(feature_importances, index=selected_features, columns=["Importance"]).sort_values(by="Importance", ascending=False))
+            fig = plt.figure(figsize=(10, 5))
+            sns.barplot(x=selected_features, y=feature_importances)
+            plt.title("Feature Importance")
+            plt.xticks(rotation=90)
+            st.pyplot(fig)
+            plt.close(fig)
+
+    
+           
+        else:
         # Title and description
             st.title("Machine Learning Model Comparison Dashboard")
             st.markdown("""
