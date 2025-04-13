@@ -198,7 +198,7 @@ if uploaded_file is not None:
             
 
             def evaluate_model(model, X_test, y_test, average='binary'):
-<<<<<<< HEAD
+
                 if models_to_train == "Linear Regression":
                     y_pred = model.predict(X_test)
                     return {
@@ -217,7 +217,7 @@ if uploaded_file is not None:
                             roc_auc = roc_auc_score(y_test, y_prob)
                         except:
                             roc_auc = None  # Model doesn't support predict_proba
-=======
+
                 y_pred = model.predict(X_test)
                 
                 # Handle probability prediction safely
@@ -239,7 +239,7 @@ if uploaded_file is not None:
                     "ROC AUC": roc_auc,
                     "ypred" : y_pred,
                     "y_proba" : y_prob
->>>>>>> 29ffc62028695d40b58ca7e5eae16047519bfe7f
+
 
                         # Handle multiclass case
                         if len(set(y_test)) > 2:
@@ -356,7 +356,7 @@ if uploaded_file is not None:
                 st.error(f"Please provide Classification problem for selected model: {e}")
                 st.title("Model's Information")
 
-<<<<<<< HEAD
+
             col1 , col2  = st.columns(2)
             with col1:
                 st.subheader("Model Parameters")
@@ -412,7 +412,7 @@ if uploaded_file is not None:
             - Visualize
              results
             """)
-=======
+
                 col1 , col2  = st.columns(2)
                 with col1:
                     st.subheader("Model Parameters")
@@ -457,7 +457,7 @@ if uploaded_file is not None:
 
             except Exception as e:
                 st.error(f"Error plotting confusion matrix or ROC curve: {e}")
->>>>>>> 29ffc62028695d40b58ca7e5eae16047519bfe7f
+
 
     compare = st.sidebar.checkbox("Comapre all Models", value=False)
     if compare:
