@@ -399,47 +399,6 @@ if uploaded_file is not None:
             st.pyplot(fig)
             plt.close(fig)
 
-    
-           
-        else:
-
-            col1 , col2  = st.columns(2)
-            with col1:
-                st.subheader("Model Parameters")
-                st.write(model.get_params())
-            with col2:
-                st.subheader("Model Hyperparameters")
-                st.write(model.get_params())
-            
-            col3 , col4 , col5 = st.columns(3)
-            with col3:
-                st.write(f"Test size: {test_size}%")
-            with col4:
-                st.write(f"Random state: {random_state}")
-            with col5 :
-                st.write(f"Scaling: {scale_numeric}")
-            
-                
-            col6 , col7= st.columns(2)
-            with col6:
-                st.write(f"Encoding type: {encode_categorical}")
-            with col7:
-                st.write(f"Target variable: {target_col}")
-            
-            st.subheader("Feature Importance")
-            if hasattr(model, "feature_importances_"):
-                feature_importances = model.feature_importances_
-            else:
-                feature_importances = model.coef_[0] if hasattr(model, "coef_") else None
-            st.write(f"Selected features: {selected_features}")
-            
-            st.table(pd.DataFrame(feature_importances, index=selected_features, columns=["Importance"]).sort_values(by="Importance", ascending=False))
-            fig = plt.figure(figsize=(10, 5))
-            sns.barplot(x=selected_features, y=feature_importances)
-            plt.title("Feature Importance")
-            plt.xticks(rotation=90)
-            st.pyplot(fig)
-            plt.close(fig)
 
 
 
